@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Information</title>
+</head>
+ <!-- CSS Styling -->
+ <style>
+    /* Styling for the input table */
+    table {
+        margin-bottom: 20px;
+        border-collapse: collapse;
+        width: 50%;
+    }
+    table, th, td {
+        border: 1px solid black;
+        padding: 10px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2; /* Light gray background for header */
+    }
+    td {
+        background-color: #fff; /* White background for table body */
+    }
+    /* Styling for the dynamically generated student table */
+    #studentTable {
+        margin-top: 20px;
+        width: 80%;
+        border-collapse: collapse;
+    }
+    #studentTable th, #studentTable td {
+        border: 1px solid #333;
+        padding: 10px;
+        text-align: center;
+    }
+    #studentTable th {
+        background-color: #4CAF50; /* Green background for header */
+        color: white;
+    }
+    #studentTable tr:nth-child(even) {
+        background-color: #f9f9f9; /* Alternate row color */
+    }
+    #studentTable tr:nth-child(odd) {
+        background-color: #fff; /* White background for odd rows */
+    }
+    #studentTable td button {
+        padding: 5px 10px;
+        background-color: #f44336; /* Red delete button */
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    #studentTable td button:hover {
+        background-color: #d32f2f; /* Darker red on hover */
+    }
+</style>
+<body>
+    <h2>Student Information</h2>
+
+    <!-- Input Fields in a Table Format -->
+    <table border="1">
+        <tr>
+            <td><label for="name">Name:</label></td>
+            <td><input type="text" id="name" required></td> <!-- Name input -->
+        </tr>
+        <tr>
+            <td><label for="age">Age:</label></td>
+            <td><input type="number" id="age" required></td> <!-- Age input -->
+        </tr>
+        <tr>
+            <td><label>Gender:</label></td>
+            <td>
+                <!-- Gender radio buttons -->
+                <input type="radio" id="male" name="gender" value="Male" required> Male
+                <input type="radio" id="female" name="gender" value="Female" required> Female
+                <input type="radio" id="other" name="gender" value="Other" required> Other
+            </td>
+        </tr>
+        <tr>
+            <td><label for="course">Course:</label></td>
+            <td>
+                <!-- Course dropdown -->
+                <select id="course" required>
+                    <option value="Java">Java</option>
+                    <option value="HTML">HTML</option>
+                    <option value="CSS">CSS</option>
+                    <option value="JavaScript">JavaScript</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><label for="email">Email:</label></td>
+            <td><input type="email" id="email" required></td> <!-- Email input -->
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <!-- Add Student button -->
+                <button onclick="addStudent()">Add Student</button>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Placeholder for the dynamically generated table -->
+    <div id="tableContainer"></div>
+
+    <script>
+        function addStudent() {
+            // Get values from input fields
+            const name = document.getElementById('name').value; // Get the name value
+            const age = document.getElementById('age').value; // Get the age value
+            const gender = document.querySelector('input[name="gender"]:checked').value; // Get the selected gender
+            const course = document.getElementById('course').value; // Get the selected course
+            const email = document.getElementById('email').value; // Get the email value
+
+            // Get the table container div where the table will be inserted
+            const tableContainer = document.getElementById('tableContainer');
+
+            // Check if the student table doesn't already exist
+            if (!document.getElementById('studentTable')) {
+                // Create a new table dynamically
+                const table = document.createElement('table');
+                table.id = 'studentTable'; // Set the table id to 'studentTable'
+                table.border = '1'; // Set the table border to 1 for visibility
+
+                // Create the table header
+                const thead = table.createTHead(); // Create the table head element
+                const headerRow = thead.insertRow(); // Insert a new row in the table head
+
+                // Array of headers for the table
+                const headers = ['Name', 'Age', 'Gender', 'Course', 'Email', 'Action'];
+
+                // Loop through the headers array and create header cells
+                headers.forEach(headerText => {
+                    const th = document.createElement('th'); // Create a new table header cell (th)
+                    th.appendChild(document.createTextNode(headerText)); // Set the text for each header cell
+                    headerRow.appendChild(th); // Append the header cell to the header row
+                });
+
+                // Append the newly created table to the tableContainer div
+                tableContainer.appendChild(table);
+            }
+
+            // Insert a new row into the table body (or create a tbody if it doesn't exist)
+            const table = document.getElementById('studentTable'); // Get the table by its ID
+            const tbody = table.tBodies[0] || table.createTBody();  // If tbody doesn't exist, create it
+            const newRow = tbody.insertRow(); // Insert a new row into the tbody
+
+            // Insert cells into the new row and set the corresponding values
+            newRow.insertCell(0).innerText = name; // Set the name in the first cell
+            newRow.insertCell(1).innerText = age; // Set the age in the second cell
+            newRow.insertCell(2).innerText = gender; // Set the gender in the third cell
+            newRow.insertCell(3).innerText = course; // Set the course in the fourth cell
+            newRow.insertCell(4).innerText = email; // Set the email in the fifth cell
+
+            // Add a delete button to the last cell of the row
+            const deleteCell = newRow.insertCell(5); // Create a new cell for the delete button
+            const deleteButton = document.createElement('button'); // Create a delete button element
+            deleteButton.innerText = 'Delete'; // Set the button text to 'Delete'
+            deleteButton.onclick = function () { // Add an onclick event to delete the row
+                tbody.deleteRow(newRow.rowIndex - 1); // Delete the row when the button is clicked
+
+                // If the table becomes empty, remove the entire table
+                if (tbody.rows.length === 0) {
+                    tableContainer.innerHTML = ''; // Clear the tableContainer div
+                }
+            };
+            deleteCell.appendChild(deleteButton); // Append the delete button to the last cell
+
+            // Clear the input fields after adding the student
+            document.getElementById('name').value = ''; // Clear the name input field
+            document.getElementById('age').value = ''; // Clear the age input field
+            document.querySelector('input[name="gender"]:checked').checked = false; // Clear the selected gender
+            document.getElementById('course').value = 'Java'; // Reset the course dropdown to 'Java'
+            document.getElementById('email').value = ''; // Clear the email input field
+        }
+    </script>
+
+</body>
+</html>
